@@ -29,7 +29,7 @@ DEFAULT_FUNCTIONS = {
     'inf': lambda: 2 ** 53 - 1,
     'pow': pow,
     'date_now': lambda: date.today().isoformat(),
-    'datetime_now': lambda: datetime.now(),
+    'datetime_now': datetime.now,
     'get_uuid': lambda: str(uuid4()),
     'loads': json.loads,
     'dumps': json.dumps

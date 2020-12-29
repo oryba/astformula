@@ -1,3 +1,3 @@
-from main import ASTFormula
+from astformula.main import ASTFormula
 
 __all__ = ['ASTFormula']
