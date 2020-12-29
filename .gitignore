@@ -1,2 +1,5 @@
 /venv/
 /.idea/
+/ASTFormula.egg-info/
+/dist/
+/lf_logs/astformula/prepare_pip3.log
