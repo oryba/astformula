@@ -166,16 +166,23 @@ def ast_index(engine: 'ASTFormula', node, variables):
 
 
 def ast_call(engine: 'ASTFormula', node, variables):
-    if not getattr(node.func, 'id', None):
-        raise UnsupportedOperationError(
-            f'Function {node.func} is not supported')
-    if node.func.id == 'iferror':
-        result = if_error(engine, variables, *node.args)
-    else:
-        result = engine.get_function(node.func.id)(
-            *engine.evaluate(node.args, variables),
-            **get_keywords(engine, node, variables))
-    return result
+    if isinstance(node.func, ast.Name):
+        if not getattr(node.func, 'id', None):
+            raise UnsupportedOperationError(
+                f'Function {node.func} is not supported')
+        if node.func.id == 'iferror':
+            result = if_error(engine, variables, *node.args)
+        else:
+            result = engine.get_function(node.func.id)(
+                *engine.evaluate(node.args, variables),
+                **get_keywords(engine, node, variables))
+        return result
+
+    func = engine.evaluate(node.func, variables)
+    return func(
+        *engine.evaluate(node.args, variables),
+        **get_keywords(engine, node, variables)
+    )
 
 
 def ast_attr(engine: 'ASTFormula', node, variables):
