@@ -51,13 +51,20 @@ class ASTFormula:
         except SyntaxError as e:
             raise ParsingError(message=e.msg, node=e.text) from e
 
+    @staticmethod
+    def _unparse(node):
+        try:
+            return astunparse.unparse(node)
+        except Exception:  # pylint: disable=W0703
+            return type(node)
+
     def evaluate(self, node, tree_vars: Union[dict, None] = None):
         try:
             return self.process_eval(node, tree_vars)
         except CalculationError as e:
             raise e
         except Exception as e:
-            node_fail = astunparse.unparse(node)
+            node_fail = ASTFormula._unparse(node)
             raise CalculationError(
                 message=str(e),
                 node=node_fail
@@ -68,7 +75,7 @@ class ASTFormula:
         if not processor:
             raise UnsupportedASTNodeError(
                 message=f'No processor defined for node {type(node)}',
-                node=astunparse.unparse(node)
+                node=ASTFormula._unparse(node)
             )
         return processor(self, node, variables)
 
