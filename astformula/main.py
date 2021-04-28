@@ -72,6 +72,15 @@ class ASTFormula:
 
     def process_eval(self, node, variables: Union[dict, None] = None):
         processor = self.node_processors.get(type(node))
+        
+        # if no processor defined directly checking for subclasses
+        # TODO: cover with tests
+        if not processor:
+            for typ, proc in self.node_processors.items():
+                if isinstance(node, typ):
+                    processor = proc
+                    break
+        
         if not processor:
             raise UnsupportedASTNodeError(
                 message=f'No processor defined for node {type(node)}',
