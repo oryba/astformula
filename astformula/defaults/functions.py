@@ -26,6 +26,8 @@ DEFAULT_FUNCTIONS = {
     'bool': bool,
     'enumerate': enumerate,
     'reversed': reversed,
+    'range': range,
+    'zip': zip,
     'inf': lambda: 2 ** 53 - 1,
     'pow': pow,
     'date_now': lambda: date.today().isoformat(),
