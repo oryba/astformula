@@ -161,8 +161,14 @@ def ast_dict(engine: 'ASTFormula', node, variables):
 
 
 def ast_index(engine: 'ASTFormula', node, variables):
-    return engine.evaluate(engine.evaluate(node.value, variables)[
-                               engine.evaluate(node.slice.value, variables)])
+    lst = engine.evaluate(node.value, variables)
+    if isinstance(node.slice, ast.Index):
+        # Handle regular index
+        idx = engine.evaluate(node.slice.value, variables)
+    else:
+        # Handle slices
+        idx = engine.evaluate(node.slice, variables)
+    return engine.evaluate(lst[idx])
 
 
 def ast_call(engine: 'ASTFormula', node, variables):
@@ -239,6 +245,14 @@ def ast_name_constant(
     return node.value
 
 
+def ast_slice(
+        engine: 'ASTFormula', node, variables):  # pylint: disable=W0613
+    lower = engine.evaluate(node.lower, variables)
+    upper = engine.evaluate(node.upper, variables)
+    step = engine.evaluate(node.step, variables)
+    return slice(lower, upper, step)
+
+
 DEFAULT_PROCESSORS = {
     ast.Num: num,
     ast.Constant: constant,
@@ -260,5 +274,6 @@ DEFAULT_PROCESSORS = {
     ast.IfExp: ast_if,
     (ast.GeneratorExp, ast.ListComp): ast_list_comp,
     ast.Name: ast_name,
-    ast.NameConstant: ast_name_constant
+    ast.NameConstant: ast_name_constant,
+    ast.Slice: ast_slice
 }
