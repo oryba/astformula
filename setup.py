@@ -13,13 +13,13 @@ def read(name):
 
 setup(
     name='ASTFormula',
-    version='0.0.2',
+    version='0.0.3',
     author='Oleh Rybalchenko',
     author_email='rv.oleg.ua@gmail.com',
     url='https://github.com/oryba/astformula',
     description='A simple and extensible AST-based Python formula engine '
                 'to execute string calculation statements',
-    download_url='https://github.com/oryba/astformula/archive/v0.0.2.zip',
+    download_url='https://github.com/oryba/astformula/archive/v0.0.3.zip',
     license='OSI Approved (BSD)',
     packages=find_packages(),
     install_requires=['astunparse'],
