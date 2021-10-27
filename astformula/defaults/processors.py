@@ -210,8 +210,9 @@ def ast_if(engine: 'ASTFormula', node, variables):
     return engine.evaluate(node.orelse, variables)
 
 
-def ast_list_comp(engine: 'ASTFormula', node, variables):
-    result = []
+def ast_comp(engine: 'ASTFormula', node, variables):
+    dict_mode = isinstance(node, ast.DictComp)
+    result = {} if dict_mode else []
     if node.generators:
         gen = node.generators[0]
         for val in engine.evaluate(gen.iter, variables):
@@ -225,12 +226,15 @@ def ast_list_comp(engine: 'ASTFormula', node, variables):
                     f"Unsupported type {type(gen.target)} for"
                     f"list comprehensions")
 
-            if not gen.ifs or all(bool(engine.evaluate(
-                    cond,
-                    {**variables, **local_vars}
-            )) for cond in gen.ifs):
-                result.append(
-                    engine.evaluate(node.elt, {**variables, **local_vars}))
+            vars_context = {**variables, **local_vars}
+
+            if not gen.ifs or all(bool(engine.evaluate(cond, vars_context)) for cond in gen.ifs):
+                if dict_mode:
+                    result[engine.evaluate(node.key, vars_context)] = engine.evaluate(node.value, vars_context)
+                else:
+                    result.append(
+                        engine.evaluate(node.elt, vars_context)
+                    )
     return result
 
 
@@ -272,7 +276,7 @@ DEFAULT_PROCESSORS = {
     ast.Call: ast_call,
     ast.Attribute: ast_attr,
     ast.IfExp: ast_if,
-    (ast.GeneratorExp, ast.ListComp): ast_list_comp,
+    (ast.GeneratorExp, ast.ListComp, ast.DictComp): ast_comp,
     ast.Name: ast_name,
     ast.NameConstant: ast_name_constant,
     ast.Slice: ast_slice
